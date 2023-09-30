@@ -1,45 +1,51 @@
-from fastapi import FastAPI, UploadFile, status, Response
-import cloudinary
-import cloudinary.api
-from cloudinary.uploader import upload
+from fastapi import FastAPI, UploadFile, status, Request
+from fastapi.responses import StreamingResponse
 import dotenv
-from os import getenv
+import whisper
+import os
+from datetime import timedelta
 
 dotenv.load_dotenv()
-
-cloudinary.config(
-    cloud_name=getenv("CLOUD_NAME"),
-    api_key=getenv("API_KEY"),
-    api_secret=getenv("API_SECRET"),
-    secure=True,
-)
 
 
 app = FastAPI()
 
+def transcribe_video(filename):
+    """transcribe the given video data and return the transcript"""
+    model = whisper.load_model("base")
+    transcript = model.transcribe(filename)
+    segments = transcript['segments']
+    srtFilename = "subtitle.srt"
+    with open(srtFilename, 'a', encoding='utf-8') as srtFile:
+        for segment in segments:
+            startTime = str(0)+str(timedelta(seconds=int(segment['start'])))+',000'
+            endTime = str(0)+str(timedelta(seconds=int(segment['end'])))+',000'
+            text = segment['text']
+            segmentId = segment['id']+1
+            segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:] if text[0] == ' ' else text}\n\n"
+            srtFile.write(segment)
+    return srtFilename
+    #return transcript['text']
+
+def iterfile(path):
+        with open(path, mode="rb") as file_like:
+            yield from file_like
 
 @app.post("/upload_video", status_code=status.HTTP_201_CREATED)
-async def save_video(uthman: UploadFile):
+async def save_video(video: UploadFile):
     "saves video to database"
-    file_name = uthman.filename
-    content = await uthman.read()
-    res = upload(content, resource_type = "video", public_id = file_name)
-    return {
-            "message": "Video uploaded successfully",
-            "url": res["url"]
-            }
-
-@app.get("/get_video/{path}", status_code=status.HTTP_303_SEE_OTHER)
-async def get_video(path: str):
+    file_name = video.filename
+    with open(file_name, "wb") as buffer:
+        buffer.write(await video.read())
+    return {"message": "Video uploaded successfully",
+            "filename": file_name,
+            "transcript": transcribe_video(file_name)}
+    
+@app.get("/get_video", status_code=status.HTTP_200_OK)
+async def get_video(request: Request):
     "gets video from database"
-    res = cloudinary.api.resources(resource_type = "video")
-    if res:
-        for item in res["resources"]:
-            if item["public_id"] == path:
-                response = Response()
-                response.status_code = status.HTTP_303_SEE_OTHER
-                response.headers["Location"] = item["url"]
-                return response
+    path = request.query_params["filename"]
+    if path:
+        return StreamingResponse(iterfile(path), media_type="video/mp4")
     else:
-        
         return {"message": "Video not found"}

@@ -1,0 +1,28 @@
+1
+00:00:00,000 --> 00:00:15,000
+Hi, Holberton. My name is Naomi Srel. I'm from Batch 2, and I'm here to talk to you about the console.
+
+2
+00:00:15,000 --> 00:00:19,000
+We're super excited for you to start out on your Airbnb project.
+
+3
+00:00:19,000 --> 00:00:26,000
+The console is going to be very similar to Shell, except it's a single use function, a command line interface,
+
+4
+00:00:26,000 --> 00:00:31,000
+from which you can create, modify, and delete objects in your file storage.
+
+5
+00:00:31,000 --> 00:00:37,000
+You're probably asking yourself, why would I want to do that? The client's not going to, but see this is a tool,
+
+6
+00:00:37,000 --> 00:00:43,000
+it's a sandbox, if you will, where you can play around with ideas, see what does, and doesn't work in storage,
+
+7
+00:00:43,000 --> 00:00:49,000
+before you build out the rest of your web application. Have fun, we hope you enjoy.
+
