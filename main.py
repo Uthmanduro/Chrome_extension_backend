@@ -1,17 +1,16 @@
 from fastapi import FastAPI, UploadFile, status, Request
 from fastapi.responses import StreamingResponse, FileResponse, JSONResponse
-import dotenv
-import whisper
+#import whisper
 import os
 from datetime import timedelta
 
-dotenv.load_dotenv()
+#dotenv.load_dotenv()
 
 
 app = FastAPI()
-
+"""
 def transcribe_video(filename):
-    """transcribe the given video data and return the transcript"""
+    #transcribe the given video data and return the transcript
     model = whisper.load_model("base")
     transcript = model.transcribe(filename)
     segments = transcript['segments']
@@ -28,7 +27,7 @@ def transcribe_video(filename):
         return srtFilename
     except:
         return JSONResponse({"message": "Video not found"}, status_code=404)
-
+"""
 def iterfile(path):
         try:
             with open(path, mode="rb") as file_like:
@@ -59,7 +58,7 @@ async def get_video(path: str):
     except:
         return JSONResponse({"message": "Video not found"}, status_code=404)
 
-
+"""
 @app.get("/get_transcript/{path}", status_code=status.HTTP_200_OK)
 async def get_transcript(path: str):
     "gets transcript from database"
@@ -71,3 +70,4 @@ async def get_transcript(path: str):
             return JSONResponse({"message": "Video not found"}, status_code=404)
     except:
         return JSONResponse({"message": "Video not found"}, status_code=404)
+"""
