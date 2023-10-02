@@ -40,7 +40,7 @@ async def save_video(video: UploadFile):
     "saves video to database"
     try:
         file_name = video.filename
-        with open(file_name, "wb") as buffer:
+        with open(file_name, "ab") as buffer:
             buffer.write(await video.read())
         return {"message": "Video uploaded successfully",
                 "filename": file_name}
